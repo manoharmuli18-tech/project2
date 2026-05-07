@@ -32,8 +32,15 @@ def logout():
 
 # ---------------- HOME ----------------
 def get_db_connection():
-    database_url = os.environ.get('DATABASE_URL', "postgresql://neondb_owner:npg_BdnzA6xCYO1i@ep-muddy-dust-aqjnbq3g.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require")
-    return psycopg2.connect(database_url)
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        # Fallback for local development only
+        database_url = "postgresql://neondb_owner:npg_BdnzA6xCYO1i@ep-muddy-dust-aqjnbq3g.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require"
+    try:
+        return psycopg2.connect(database_url)
+    except Exception as e:
+        print(f"Database connection error: {e}")
+        raise
 
 def create_posts_table():
     conn = get_db_connection()
